@@ -9,9 +9,12 @@
 1. git clone した後、config.php 内のデータベースへの接続設定を編集する。
 2. データベースは新しく作るか、既に存在するものに接続する。
 3. terminal$ cd myframework_todo
-4. terminal$ php commands.php migrate_todos
-5. terminal$ php -S localhost:8000
-6. 以上でアプリを立ち上げることができると思います。
+4. terminal$ composer install
+composerのオートローダーを使用しています
+5. terminal$ php database/migrations/create_users_table.php
+terminals$ php database/migrations/create_todos_table.php
+6. terminal$ php -S localhost:8000
+7. 以上でアプリを立ち上げることができると思います。
 
 ![image](https://i.gyazo.com/afa29ab1516dbe21832820635ab1f7dc.png)
 
