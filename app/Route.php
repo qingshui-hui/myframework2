@@ -2,7 +2,7 @@
 
 namespace App;
 
-class Route 
+class Route
 {
   public static function get($url, $controllerName, $method)
   {

@@ -6,8 +6,16 @@
     <?=$todo->id?>
   </li>
   <li>
-    <span>content : </span>
+    <span>内容 : </span>
     <?=$todo->content?>
+  </li>
+  <li>
+    <span>作成日時 : </span>
+    <?=$todo->created_at?>
+  </li>
+  <li>
+    <span>経過日数 : </span>
+    <?=$todo->daysFromCreation()?>
   </li>
 </ul>
 <div class="links">

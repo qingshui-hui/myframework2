@@ -9,10 +9,13 @@ use App\Route;
 
 Route::resource('todos');
 Route::get('/', 'TodosController', 'index');
+Route::get('/boards', 'BoardController', 'index');
+
 Route::get('/login', 'UserController', 'showLoginForm');
 Route::post('/login', 'UserController', 'login');
 Route::get('/logout', 'UserController', 'logout');
 Route::get('/register', 'UserController', 'showRegisterForm');
 Route::post('/register', 'UserController', 'register');
+
 
 Route::get('/tests', 'TestController', 'test1');
