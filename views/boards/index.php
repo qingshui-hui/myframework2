@@ -4,122 +4,48 @@
     <meta charset="utf-8"/>
     <link rel="stylesheet" href="./public/reset.css"/>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css" integrity="sha384-v8BU367qNbs/aIZIxuivaU55N5GPF89WBerHoGA4QTcbUjYiLQtKdrfXnqAcXyTv" crossorigin="anonymous">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   </head>
   <body>
     <header>
-      <h3>ボードリスト<a href="/">ボードを追加する</a></h3>
+      <h3>ボードリスト<a href="/boards/new">ボードを追加する</a></h3>
     </header>
     <div class="content_wrapper">
       <div class="boards">
-        <div class="board">
-          <h3>家事あああああああああああああああああああああああああああああ</h3>
-          <div class="addcard"><a href="/#">カードを追加する</a></div>
-          <ul class="cards">
-            <li class="card">
-              <span>あああああああああああああああああああああああああああああああああああああ</span>
-              <i class="fas fa-times"></i>
-              <i class="fas fa-edit"></i>
-            </li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-          </ul>
-        </div>
-        <div class="board">
-          <h3>家事ああああ</h3>
-          <ul class="cards">
-            <li class="card">
-              <span>あああああああああああああああああああああああああああああああああああああ</span>
-              <i class="fas fa-times"></i>
-              <i class="fas fa-edit"></i>
-            </li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-          </ul>
-        </div>
-        <div class="board">
-          <h3>家事あああああああああああああああああああああああああああああ</h3>
-          <ul class="cards">
-            <li class="card">
-              <span>あああああああああああああああああああああああああああああああああああああ</span>
-              <i class="fas fa-times"></i>
-              <i class="fas fa-edit"></i>
-            </li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-          </ul>
-        </div>
-        <div class="board">
-          <h3>家事あああああああああああああああああああああああああああああ</h3>
-          <ul class="cards">
-            <li class="card">
-              <span>あああああああああああああああああああああああああああああああああああああ</span>
-              <i class="fas fa-times"></i>
-              <i class="fas fa-edit"></i>
-            </li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-            <li class="card">あああ</li>
-          </ul>
-        </div>
+        <?php foreach ($boards as $board): ?>
+          <div class="board">
+            <h3><?=h($board->title)?></h3>
+            <div class="addcard">
+              <a href="/boards/<?=$board->id?>/cards/new">カードを追加する</a>
+            </div>
+            <ul class="cards sortable" id="sortable-<?=$board->id?>">
+              <?php foreach($board->cards() as $card): ?>
+                <li class="card draggable">
+                  <span><?= $card->title ?></span>
+                  <a href="/cards/<?=$card->id?>/destroy">
+                    <i class="fas fa-times"></i>
+                  </a>
+                  <a href="">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                </li>
+              <?php endforeach; ?>
+            </ul>
+          </div>
+        <?php endforeach; ?>
       </div>
     </div>
   </body>
 </html>
+
+<script>
+$(function() {
+  $( ".sortable" ).sortable({
+    connectWith: ".sortable"
+  });
+});
+</script>
 
 <style>
 a {

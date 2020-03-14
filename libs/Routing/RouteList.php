@@ -6,6 +6,7 @@ class RouteList
 {
   private static $instance = null;
   private $routes = [];
+  
   //Singleton
   public static function getInstance() :RouteList
   {
@@ -20,14 +21,9 @@ class RouteList
     array_push($this->routes, $route);
   }
 
-  public function getRouteList()
-  {
-    return $this->routes;
-  }
-
   public function RouteIsEmpty() :bool
   {
-    if (empty($this->getRouteList())) {
+    if (empty($this->routes)) {
       return true;
     } else {
       return false;

@@ -1,0 +1,20 @@
+<?php
+
+$command = $argv[1];
+
+if (isset($argv[2])) {
+  $command($argv[2]);
+} else {
+  $command();
+}
+
+function serve()
+{
+  print("Listening on http://localhost:8000"."\n");
+  exec("php -S localhost:8000");
+}
+
+function migrate()
+{
+  require_once('exec_migration.php');
+}

@@ -4,20 +4,22 @@ namespace Libs\Routing;
 use Libs\Routing\RouteList;
 
 class Route
+// middlewareについてはdefault()メソッドを呼ぶ executeRequest()を参照
 {
   private $url;
   private $requestMethod;
   private $controllerName;
   private $controllerMethod;
+  private $middleware;
 
-  public static function get($url, $controllerName, $method = null)
+  public static function get($url, $action)
   {
-    static::register($url, "GET", $controllerName, $method);
+    return static::register($url, "GET", $action);
   }
 
-  public static function post($url, $controllerName, $method)
+  public static function post($url, $action)
   {
-    static::register($url, "POST", $controllerName, $method);
+    return static::register($url, "POST", $action);
   }
 
   public static function resource($name, $controllerName, $option = null)
@@ -28,20 +30,26 @@ class Route
       $only = ["index", "new", "create", "show", "edit", "update", "destroy"];
     }
     if (in_array("index", $only))
-      static::get("/{$name}", $controllerName, "index");
+      static::get("/{$name}", $controllerName."@index");
     if (in_array("new", $only))
-      static::get("/{$name}/new", $controllerName, "new");
+      static::get("/{$name}/new", $controllerName."@new");
     if (in_array("create", $only))
-      static::post("/{$name}", $controllerName, "create");
+      static::post("/{$name}", $controllerName."@create");
 
     if (in_array("show", $only))
-      static::get("/{$name}/{id}", $controllerName, "show");
+      static::get("/{$name}/{id}", $controllerName."@show");
     if (in_array("edit", $only))
-      static::get("/{$name}/{id}/edit", $controllerName, "edit");
+      static::get("/{$name}/{id}/edit", $controllerName."@edit");
     if (in_array("update", $only))
-      static::post("/{$name}/{id}", $controllerName, "update");
+      static::post("/{$name}/{id}", $controllerName."@update");
     if (in_array("destroy", $only))
-      static::get("/{$name}/{id}/destroy", $controllerName, "destroy");
+      static::get("/{$name}/{id}/destroy", $controllerName."@destroy");
+  }
+
+  public function middleware($name)
+  {
+    // registerの後に呼ばれるが、上書きできていた
+    $this->middleware = $name;
   }
 
   public function checkUrl() :bool
@@ -76,25 +84,31 @@ class Route
   public function executeRequest()
   {
     $request = preg_replace('/\?.+$/', "", $_SERVER['REQUEST_URI']);
+    if (!empty($this->middleware)) {
+      $middlewareName = 'App\\Middleware\\'.$this->middleware;
+      $middleware = new $middlewareName();
+      $middleware->default();
+    }
+
     $urlArray = preg_split('#/#', $this->url);
     $requestArray = preg_split('#/#', $request);
-
-
     $this->setUrlParams($urlArray, $requestArray);
-    $controllerName = $this->controllerName;
-    $controllerMethod = $this->controllerMethod;
-    if (is_callable($controllerName)) {
-      $controllerName();
+
+    if (is_callable($this->action)) {
+      $action = $this->action;
+      $action();
       return;
     }
-    $controllerName = 'App\\Controllers\\'.$controllerName;
+    $splittedAction = preg_split('/@/', $this->action);
+    $controllerMethod = $splittedAction[1];
+    $controllerName = 'App\\Controllers\\'.$splittedAction[0];
     $controller = new $controllerName();
     $controller->$controllerMethod();
   }
 
   public function toString() {
-    if (is_string($this->controllerName)) {
-      $action = $this->controllerName."@".$this->controllerMethod;
+    if (is_string($this->action)) {
+      $action = $this->action;
     } else {
       $action = "closure";
     }
@@ -103,20 +117,22 @@ class Route
       <td>".$this->requestMethod."</td>
       <td>".$this->url."</td>
       <td>".$action."</td>
+      <td>".$this->middleware."</td>
     </tr>";
   }
 
   // --- protected or private members ---
 
-  private static function register($url, $requestMethod, $controllerName, $method)
+  private static function register($url, $requestMethod, $action)
   {
     $routeList = RouteList::getInstance();
     $instance = new Route();
     $instance->url = $url;
     $instance->requestMethod = $requestMethod;
-    $instance->controllerName = $controllerName;
-    $instance->controllerMethod = $method;
+    $instance->action = $action;
+    // $instance->middleware = $middleware;
     $routeList->addRoute($instance);
+    return $instance;
   }
 
   protected static function includeCurlyBrace($str) :bool

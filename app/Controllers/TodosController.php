@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 use App\Models\Todo;
+use App\Middleware\Authenticate;
 
 class TodosController 
 {
