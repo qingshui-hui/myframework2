@@ -16,11 +16,9 @@
     <?php } ?>
     
   </header>
-
-<?php
-$endlayout = "
-<p style='display:none;'>endoflayout</p>
+  <div class='content'>
+    <?php $view->yield(); ?>
+  </div>
+  <?php require_once('views/layout/footer.php'); ?>
 </body>
-</html>
-"
-?>
+</heml>

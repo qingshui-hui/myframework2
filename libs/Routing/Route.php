@@ -12,14 +12,14 @@ class Route
   private $controllerMethod;
   private $middleware;
 
-  public static function get($url, $action)
+  public static function get($url, $action, $middleware = null)
   {
-    return static::register($url, "GET", $action);
+    return static::register($url, "GET", $action, $middleware);
   }
 
-  public static function post($url, $action)
+  public static function post($url, $action, $middleware = null)
   {
-    return static::register($url, "POST", $action);
+    return static::register($url, "POST", $action, $middleware);
   }
 
   public static function resource($name, $controllerName, $option = null)
@@ -29,21 +29,26 @@ class Route
     } else {
       $only = ["index", "new", "create", "show", "edit", "update", "destroy"];
     }
+    if (!isset($option['middleware'])) {
+      $middleware = null;
+    } else {
+      $middleware = $option['middleware'];
+    }
     if (in_array("index", $only))
-      static::get("/{$name}", $controllerName."@index");
+      static::get("/{$name}", $controllerName."@index", $middleware);
     if (in_array("new", $only))
-      static::get("/{$name}/new", $controllerName."@new");
+      static::get("/{$name}/new", $controllerName."@new", $middleware);
     if (in_array("create", $only))
-      static::post("/{$name}", $controllerName."@create");
+      static::post("/{$name}", $controllerName."@create", $middleware);
 
     if (in_array("show", $only))
-      static::get("/{$name}/{id}", $controllerName."@show");
+      static::get("/{$name}/{id}", $controllerName."@show", $middleware);
     if (in_array("edit", $only))
-      static::get("/{$name}/{id}/edit", $controllerName."@edit");
+      static::get("/{$name}/{id}/edit", $controllerName."@edit", $middleware);
     if (in_array("update", $only))
-      static::post("/{$name}/{id}", $controllerName."@update");
+      static::post("/{$name}/{id}", $controllerName."@update", $middleware);
     if (in_array("destroy", $only))
-      static::get("/{$name}/{id}/destroy", $controllerName."@destroy");
+      static::get("/{$name}/{id}/destroy", $controllerName."@destroy", $middleware);
   }
 
   public function middleware($name)
@@ -87,7 +92,9 @@ class Route
     if (!empty($this->middleware)) {
       $middlewareName = 'App\\Middleware\\'.$this->middleware;
       $middleware = new $middlewareName();
-      $middleware->default();
+      if (!$middleware->default()) {
+        return;
+      }
     }
 
     $urlArray = preg_split('#/#', $this->url);
@@ -123,14 +130,14 @@ class Route
 
   // --- protected or private members ---
 
-  private static function register($url, $requestMethod, $action)
+  private static function register($url, $requestMethod, $action, $middleware = null)
   {
     $routeList = RouteList::getInstance();
     $instance = new Route();
     $instance->url = $url;
     $instance->requestMethod = $requestMethod;
     $instance->action = $action;
-    // $instance->middleware = $middleware;
+    $instance->middleware = $middleware;
     $routeList->addRoute($instance);
     return $instance;
   }

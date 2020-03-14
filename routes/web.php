@@ -1,8 +1,14 @@
 <?php
 
 use Libs\Routing\Route;
-Route::get('/todos/new', 'TodosController@new')->middleware('Authenticate');
-Route::resource('todos', 'TodosController');
+// Route::get('/todos/new', 'TodosController@new')->middleware('Authenticate');
+Route::resource('todos', 'TodosController', [
+  'only' => ['new', 'create', 'edit', 'update', 'destroy'],
+  'middleware' => 'Authenticate'
+]);
+Route::resource('todos', 'TodosController', [
+  'only' => ['index', 'show']
+]);
 Route::get('/', 'TodosController@index');
 
 Route::resource('boards', 'BoardController', [

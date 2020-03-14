@@ -1,6 +1,7 @@
 <?php
 
 use Libs\Routing\RouteList;
+use Libs\View;
 
 function h($str)
 {
@@ -20,4 +21,19 @@ function env($key, $default = null)
   } else {
     return $default;
   }
+}
+
+function view($content, Array $data = [])
+{
+  $view = new View();
+  $view->setContent($content);
+  $view->setData($data);
+  return $view;
+}
+
+function render($content, Array $data = [])
+{
+  // view() のショートカット
+  $view = new View();
+  $view->render($content, $data);
 }

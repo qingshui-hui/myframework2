@@ -10,7 +10,7 @@ class CardController
   public function new()
   {
     $board = Board::find($_REQUEST['board']);
-    require_once('views/cards/new.php');
+    return view('cards/new.php', ['board' => $board])->render();
   }
 
   public function create()

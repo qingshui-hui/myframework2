@@ -1,4 +1,3 @@
-<?php require_once 'views/layout/app.php'; ?>
 
 <form action="/login" method="post">
   <label for="email">メールアドレス</label>
@@ -13,5 +12,3 @@
   <span>アカウントをお持ちでない方は-></span>
   <a href="/register">新規登録</a>
 </div>
-
-<?php echo $endlayout ?>

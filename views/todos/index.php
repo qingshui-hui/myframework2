@@ -1,4 +1,3 @@
-<?php require_once 'views/layout/todo.php';?>
 
 <ul class='todo_list'>
   <?php foreach ($todos as $todo): ?>
@@ -10,5 +9,3 @@
     </li>
   <?php endforeach; ?>
 </ul>
-
-<?php echo $endlayout ?>

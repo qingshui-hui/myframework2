@@ -9,12 +9,12 @@ class BoardController
   public function index()
   {
     $boards = Board::all();
-    require_once 'views/boards/index.php';
+    return render('boards/index.php', ['boards' => $boards]);
   }
 
   public function new()
   {
-    require_once 'views/boards/new.php';
+    return view('boards/new.php')->render();
   }
 
   public function create()
