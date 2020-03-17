@@ -5,20 +5,28 @@ use PDO;
 
 class Database
 {
-    const DSN = 'mysql:host=localhost;dbname=todo_app_development;charset=utf8mb4';
-    const DB_USER = 'root';
-    const DB_PASS = null;
+    private static $DSN;
+    private static $DB_USER;
+    private static $DB_PASS;
 
     private static $instance = null;
     private $pdo = null;
+
+    private static function init()
+    {
+        self::$DSN = env('DSN');
+        self::$DB_USER = env('DB_USER');
+        self::$DB_PASS = env('DB_PASS');
+    }
 
     //SingletonÉpÉ^Å[Éì
     public static function getInstance() :Database
     {
         if (is_null(self::$instance)) {
+            self::init();
             self::$instance = new Database();
-            self::$instance->pdo = new PDO(self::DSN, self::DB_USER, self::DB_PASS);
-            self::$instance->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            self::$instance->pdo = new PDO(self::$DSN, self::$DB_USER, self::$DB_PASS);
+            self::$instance->pdo->setAttribute(PDO::ATTR_ERRMODE,       PDO::ERRMODE_EXCEPTION);
         }
         return self::$instance;
     }

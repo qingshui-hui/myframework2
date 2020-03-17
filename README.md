@@ -30,4 +30,3 @@ composerのオートローダーを使用しています
 ### Controller
 - app/Controllers/ 以下にありますが、親クラスは作っていません。
 
-

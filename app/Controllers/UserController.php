@@ -8,18 +8,23 @@ class UserController
 {
   public function showLoginForm()
   {
-    require_once 'views/users/login_form.php';
+    return view('users/login_form.php')->setLayout('layout/app.php')->render();
   }
 
   public function login()
   {
-    session_start();
+    // session_start();
     if (User::authenticateUser($_POST)) {
-      print_r($_SESSION['user']);
-      echo 'ログインしました';
-      header("Location: /");
-    }
-    else {
+      print_r($_SESSION);
+      // echo $_SESSION['stored_url'];
+      if (!isset($_SESSION['stored_url'])) {
+        header("Location: /");
+      } else {
+        $next = $_SESSION['stored_url'];
+        unset($_SESSION['stored_url']);
+        header("Location: ".$next);
+      }
+    } else {
       echo 'ログインに失敗しました';
     }
   }
@@ -27,14 +32,14 @@ class UserController
   public function logout()
   {
     session_start();
-    $_SESSION = array();
+    unset($_SESSION['user']);
     // session_destory();
     header("Location: /");
   }
 
   public function showRegisterForm()
   {
-    require_once 'views/users/register_form.php';
+    return view('users/register_form.php')->setLayout('layout/app.php')->render();
   }
 
   public function register()

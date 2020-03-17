@@ -8,6 +8,7 @@
   <header>
     <a href="/todos/new">add todo</a> |
     <a href="/todos">todo list</a> |
+    <a href="/boards">boards</a> |
     <?php if (App\Models\User::isLogin()) {?>
       <a href="/logout">ログアウト</a>
     <?php } else { ?>
@@ -15,11 +16,9 @@
     <?php } ?>
     
   </header>
-
-<?php
-$endlayout = "
-<p style='display:none;'>endoflayout</p>
+  <div class='content'>
+    <?php $view->yield(); ?>
+  </div>
+  <?php require_once('views/layout/footer.php'); ?>
 </body>
-</html>
-"
-?>
+</heml>

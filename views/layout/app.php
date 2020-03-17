@@ -7,10 +7,8 @@
 <body>
   <header>
   </header>
-
-<?php
-$endlayout = "
+  <div class="content">
+    <?php $view->yield(); ?>
+  </div>
 </body>
 </html>
-"
-?>

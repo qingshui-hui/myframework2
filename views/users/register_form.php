@@ -1,4 +1,3 @@
-<?php require_once 'views/layout/app.php'; ?>
 
 <form action="/register" method="post">
   <label for="name">名前</label>
@@ -12,5 +11,3 @@
   <br>
   <button type="submit">送信</button>
 </form>
-
-<?php echo $endlayout ?>
