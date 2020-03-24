@@ -9,11 +9,11 @@
     <a href="/todos/new">add todo</a> |
     <a href="/todos">todo list</a> |
     <a href="/boards">boards</a> |
-    <?php if (App\Models\User::isLogin()) {?>
+    <?php if (App\Models\User::isLogin()):?>
       <a href="/logout">ログアウト</a>
-    <?php } else { ?>
+    <?php else: ?>
       <a href="/login">ログイン</a>
-    <?php } ?>
+    <?php endif; ?>
     
   </header>
   <div class='content'>

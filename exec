@@ -16,5 +16,5 @@ function serve()
 
 function migrate()
 {
-  require_once('exec_migration.php');
+  require_once('migrate_exec.php');
 }

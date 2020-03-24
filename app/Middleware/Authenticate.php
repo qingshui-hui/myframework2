@@ -5,7 +5,7 @@ use App\Models\User;
 
 class Authenticate
 {
-  public function default() :bool
+  public function default()
   {
     return $this->RedirectIfNotLogin();
   }
