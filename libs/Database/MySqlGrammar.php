@@ -1,6 +1,6 @@
 <?php
 
-namespace Libs;
+namespace Libs\Database;
 
 class MySqlGrammar
 {

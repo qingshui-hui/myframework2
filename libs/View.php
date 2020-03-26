@@ -42,8 +42,10 @@ class View
     $view = $this;
     if (empty($this->layout))
     {
-      foreach ($this->data as $key => $val) {
-        $$key = $val;
+      if (!empty($this->data)) {
+        foreach ($this->data as $key => $val) {
+          $$key = $val;
+        }
       }
       require_once($this->content);
       

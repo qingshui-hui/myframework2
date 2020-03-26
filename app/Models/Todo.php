@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Libs\Database\Model;
+
 class Todo extends Model
 {
   protected static $table = "todos";

@@ -2,7 +2,7 @@
 
 namespace Libs\Database;
 
-use Libs\Database;
+use Libs\Database\Database;
 
 abstract class Migration
 {

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Libs\Database\Model;
+
 class Board extends Model
 {
   protected static $table = "boards";

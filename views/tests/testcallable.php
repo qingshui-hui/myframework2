@@ -1,5 +1,6 @@
 <?php
 
-echo "Route::get('testcallable', function({
+echo "<p>Route::get('testcallable', function({
   
-}))";
+}))</p>";
+echo "<p>".$request::class()."</p>";

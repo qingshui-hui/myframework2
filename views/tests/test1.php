@@ -1,10 +1,9 @@
-<p>aaa</p>
 
 <?php
-use Libs\Database;
+
+use Libs\Database\Database;
 
 echo 'hello';
-
 $db =Database::getInstance();
 $todo = $db->query('SELECT * FROM todos where id = :id',  ['id' => 1]);
 print_r($todo);
@@ -33,4 +32,36 @@ foreach ( glob( $pattern ) as $filename )
 {
   echo $filename."\n";
 }
+$users = [
+  [1, 'kusuda'],
+  [2, 'honda'],
+  [3, 'yamane'],
+  [4, 'takanashi']
+]
 ?>
+
+<p>aaa</p>
+<p><a href="/test2/3/2">/test2/3/2</a></p>
+<p><a href="/testcallable/8/14">/testcallable</a></p>
+<p><a href="/test-validation">/test-validation</a></p>
+<p><a href="/test-route">/routeList</a></p>
+
+<form action="/test4" method="POST" enctype="multipart/form-data">
+  <div>名前
+    <input type="text" name="name" value="yamada">
+  </div>
+  <div>タグ
+    <input type="text" name="tag" value="hito">
+  </div>
+  <div>内容
+    <input type="text" name="content" value="yoroshiku">
+  </div>
+  <div>
+    <input type="file" name="image">
+  </div>
+  <?php foreach($users as $user): ?>
+    <input type="checkbox" name="userIds[]" id="" value="<?= $user[0] ?>">
+    <span><?= $user[1] ?></span>
+  <?php endforeach; ?>
+  <input type="submit" value="送信">
+</form>

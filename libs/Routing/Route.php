@@ -2,6 +2,7 @@
 
 namespace Libs\Routing;
 use Libs\Routing\RouteList;
+use Libs\Http\Request;
 
 class Route
 // middlewareについてはdefault()メソッドを呼ぶ executeRequest()を参照
@@ -11,6 +12,8 @@ class Route
   private $controllerName;
   private $controllerMethod;
   private $middleware;
+
+  private $urlParams;
 
   public static function get($url, $action, $middleware = null)
   {
@@ -103,14 +106,31 @@ class Route
 
     if (is_callable($this->action)) {
       $action = $this->action;
-      $action();
-      return;
+      $function = new \ReflectionFunction($this->action);
+      if (empty($function->getParameters())) {
+        $function->invoke();
+        return;
+      } else {
+        $preparedParams = $this->prepareMethodParams($function->getParameters());
+        $function->invokeArgs($preparedParams);
+        return;
+      }
     }
+
     $splittedAction = preg_split('/@/', $this->action);
     $controllerMethod = $splittedAction[1];
     $controllerName = 'App\\Controllers\\'.$splittedAction[0];
+
     $controller = new $controllerName();
-    $controller->$controllerMethod();
+    $method = new \ReflectionMethod($controllerName, $controllerMethod);
+    if (empty($method->getParameters())) {
+      $method->invoke($controller);
+      return;
+    } else {
+      $preparedParams = $this->prepareMethodParams($method->getParameters());
+      $method->invokeArgs($controller, $preparedParams);
+      return;
+    }
   }
 
   public function toString() {
@@ -162,11 +182,40 @@ class Route
 
   protected function setUrlParams(Array $url, Array $request)
   {
+    $urlParams = [];
     for ($i = 0; $i < count($url) ; $i++) {
       if (static::includeCurlyBrace($url[$i])) {
         $_REQUEST[static::removeCurlyBrace($url[$i])] = $request[$i];
+        $urlParams[static::removeCurlyBrace($url[$i])] = $request[$i];
       }
     }
-    // print_r($_REQUEST);
+    $this->urlParams = $urlParams;
+  }
+
+  protected function getUrlParams(Array $url, Array $request)
+  {
+    $urlParams = [];
+    for ($i = 0; $i < count($url) ; $i++) {
+      if (static::includeCurlyBrace($url[$i])) {
+        $urlParams[static::removeCurlyBrace($url[$i])] = $request[$i];
+      }
+    }
+    return $urlParams;
+  }
+
+  protected function prepareMethodParams(Array $reflParams)
+  {
+    $urlParams = $this->urlParams;
+    $preparingParams = [];
+
+    if ($reflParams[0]->hasType() && $reflParams[0]->getType()->getName() === 'Libs\Http\Request') {
+      $preparingParams[0] = new Request();
+    }
+    foreach ($reflParams as $index => $reflParam) {
+      if (isset($urlParams[$reflParam->getName()])) {
+        $preparingParams[$index] = $urlParams[$reflParam->getName()];
+      }
+    }
+    return $preparingParams;
   }
 }

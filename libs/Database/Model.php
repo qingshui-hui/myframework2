@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace Libs\Database;
 use PDO;
-use Libs\Database;
-use Libs\MySqlGrammar as Query;
+use Libs\Database\Database;
+use Libs\Database\MySqlGrammar as Query;
 
 class Model {
   protected static $table;
