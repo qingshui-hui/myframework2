@@ -15,6 +15,7 @@ class Authenticate
     if (!User::isLogin()) {
       session_start();
       $_SESSION["stored_url"] = $_SERVER['REQUEST_URI'];
+      session_write_close();
       header('Location: /login');
       return false;
 

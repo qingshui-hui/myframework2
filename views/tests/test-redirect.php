@@ -1,6 +1,3 @@
-<?php
-
-?>
 
 <p>test-validation<a href="/test1">back</a></p>
 <p>[
@@ -8,22 +5,22 @@
       'nickname' => 'nullable|max:10',
       'title' => 'required'
     ]</p>
-<form action="/test-validation" method="post">
+<form action="/test-redirect" method="post">
   <div>e-メール
     <input type="text" name="email" id="email"
-      value="<?=$input->old('email')?>">
+      value="<?=$request->get('email')?>">
     <?php foreach($errors->get('email') as $error): ?>
       <p><?= $error ?></p>
     <?php endforeach; ?>
   </div>
   <div>ニックネーム
-    <input type="text" name="nickname" id="nickname" value="<?=$input->old('nickname')?>">
+    <input type="text" name="nickname" id="nickname" value="<?=$request->get('nickname')?>">
     <?php foreach($errors->get('nickname') as $error): ?>
       <p><?= $error ?></p>
     <?php endforeach; ?>
   </div>
   <div>タイトル
-    <input type="text" name="title" id="title" value="<?=$input->old('title')?>">
+    <input type="text" name="title" id="title" value="<?=$request->get('title')?>">
     <?php foreach($errors->get('title') as $error): ?>
       <p><?= $error ?></p>
     <?php endforeach; ?>

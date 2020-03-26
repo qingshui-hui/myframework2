@@ -4,13 +4,16 @@ namespace Libs;
 
 class View
 { 
+  const PREFIX_PATH = "views/";
   private $layout;
   private $content;
-  private $data;
+  private $data = [];
 
-  public function setContent($content)
+  public function set($content, $data = null, $layout = null)
   {
-    $this->content = 'views/'.$content;
+    $this->content = self::PREFIX_PATH.$content;
+    if (isset($data)) $this->data = $data;
+    if (isset($layout)) $this->layout = self::PREFIX_PATH.$layout;
     return $this;
   }
 
@@ -22,34 +25,29 @@ class View
 
   public function setLayout($layout)
   {
-    $this->layout = 'views/'.$layout;
+    $this->layout = self::PREFIX_PATH.$layout;
     return $this;
   }
 
   public function yield()
   {
+    // こちらでもrenderと同じように変数を定義しなおさないと、データを渡せない
     foreach ($this->data as $key => $val) {
       $$key = $val;
     }
     require_once($this->content);
   }
 
-  public function render($content = null, Array $data = [])
+  public function render()
   {
-    if (!empty($content)) $this->setContent($content);
-    if (!empty($data)) $this->data = $data;
-
-    $view = $this;
-    if (empty($this->layout))
-    {
-      if (!empty($this->data)) {
-        foreach ($this->data as $key => $val) {
-          $$key = $val;
-        }
-      }
+    foreach ($this->data as $key => $val) {
+      $$key = $val;
+    }
+    if (empty($this->layout)) {
       require_once($this->content);
-      
     } else {
+      // layoutから中身を呼び出す時、$view->yield()とする。
+      $view = $this;
       require_once($this->layout);
     }
   }

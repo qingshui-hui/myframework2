@@ -12,6 +12,6 @@ print_r($reflMethod->invokeArgs($route, [['test', '{id}', '{id2}'], ['test', '1'
 
 echo "<p>id1 = {$id1}</p>";
 echo "<p>id2 = {$id2}</p>";
-print_r($request::class());
+print_r($request);
 
 echo Str::removeBrace('{(aaa)}');

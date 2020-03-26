@@ -13,7 +13,6 @@ print_r($result);
 
 
 // セッション管理開始
-session_start();
  
 if (!isset($_SESSION['count'])) {
     // キー'count'が登録されていなければ、1を設定
@@ -44,6 +43,7 @@ $users = [
 <p><a href="/test2/3/2">/test2/3/2</a></p>
 <p><a href="/testcallable/8/14">/testcallable</a></p>
 <p><a href="/test-validation">/test-validation</a></p>
+<p><a href="/test-redirect">/test-redirect</a></p>
 <p><a href="/test-route">/routeList</a></p>
 
 <form action="/test4" method="POST" enctype="multipart/form-data">

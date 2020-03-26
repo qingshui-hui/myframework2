@@ -9,12 +9,12 @@ class BoardController
   public function index()
   {
     $boards = Board::all();
-    return render('boards/index.php', ['boards' => $boards]);
+    return view('boards/index.php', ['boards' => $boards]);
   }
 
   public function new()
   {
-    return view('boards/new.php')->render();
+    return view('boards/new.php');
   }
 
   public function create()

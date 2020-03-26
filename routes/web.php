@@ -33,10 +33,13 @@ Route::get('/test-route', function() {
   require_once("views/tests/routeList.php");
 });
 Route::get('/testcallable/{id1}/{id2}', function(Request $request, $id1, $id2) {
-  return view('tests/testcallable.php', ['id1' => $id1, 'id2' => $id2, 'request' => $request])->render();
+  return view('tests/testcallable.php', 
+          ['id1' => $id1, 'id2' => $id2, 'request' => $request]);
 });
 Route::post('/test4', function(Request $request) {
-  return render('tests/test4.php', ['request' => $request]);
+  return view('tests/test4.php', ['request' => $request]);
 });
 Route::get('/test-validation', 'TestController@showValidationForm');
 Route::post('/test-validation', 'TestController@testValidation');
+Route::get('/test-redirect', 'TestController@testRedirectForm');
+Route::post('/test-redirect', 'TestController@testRedirect');

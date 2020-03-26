@@ -1,4 +1,5 @@
 <?php
+// 03/26 コントローラーのメソッドないでviewをレンダリングするのではなく、メソッドの返り値として渡された、viewのインスタンスに対して、route内でrender()を行うように変更した。
 
 namespace Libs\Routing;
 use Libs\Routing\RouteList;
@@ -13,7 +14,9 @@ class Route
   private $controllerMethod;
   private $middleware;
 
-  private $urlParams;
+  // routeアクションの実行時に決まる変数
+  private $requestUrl = null;
+  private $urlParams = [];
 
   public static function get($url, $action, $middleware = null)
   {
@@ -91,46 +94,18 @@ class Route
 
   public function executeRequest()
   {
-    $request = preg_replace('/\?.+$/', "", $_SERVER['REQUEST_URI']);
-    if (!empty($this->middleware)) {
-      $middlewareName = 'App\\Middleware\\'.$this->middleware;
-      $middleware = new $middlewareName();
-      if (!$middleware->default()) {
-        return;
-      }
+    if ($this->passMiddleware()) {
+      $this->setUrlParams();
+      $return = $this->executeAction();
+      if (is_object($return)) {
+        // 関数の返り値が空だと、Warning, nullだと何もなし;
+        if (get_class($return) === "Libs\View") {
+          // これにはオブジェクトを渡さなければならない
+          $return->render();
+        }
+      };
     }
-
-    $urlArray = preg_split('#/#', $this->url);
-    $requestArray = preg_split('#/#', $request);
-    $this->setUrlParams($urlArray, $requestArray);
-
-    if (is_callable($this->action)) {
-      $action = $this->action;
-      $function = new \ReflectionFunction($this->action);
-      if (empty($function->getParameters())) {
-        $function->invoke();
-        return;
-      } else {
-        $preparedParams = $this->prepareMethodParams($function->getParameters());
-        $function->invokeArgs($preparedParams);
-        return;
-      }
-    }
-
-    $splittedAction = preg_split('/@/', $this->action);
-    $controllerMethod = $splittedAction[1];
-    $controllerName = 'App\\Controllers\\'.$splittedAction[0];
-
-    $controller = new $controllerName();
-    $method = new \ReflectionMethod($controllerName, $controllerMethod);
-    if (empty($method->getParameters())) {
-      $method->invoke($controller);
-      return;
-    } else {
-      $preparedParams = $this->prepareMethodParams($method->getParameters());
-      $method->invokeArgs($controller, $preparedParams);
-      return;
-    }
+    return;
   }
 
   public function toString() {
@@ -162,6 +137,62 @@ class Route
     return $instance;
   }
 
+  private function passMiddleware() :bool
+  {
+    if (!empty($this->middleware)) {
+      $middlewareName = 'App\\Middleware\\'.$this->middleware;
+      $middleware = new $middlewareName();
+      if (!$middleware->default()) {
+        // ミドルウェアを通過できなければ、
+        return false;
+      }
+    }
+    return true;
+  }
+
+  protected function setUrlParams()
+  {
+    $this->requestUrl = preg_replace('/\?.+$/', "", $_SERVER['REQUEST_URI']);
+    $url = preg_split('#/#', $this->url);
+    $request = preg_split('#/#', $this->requestUrl);
+    $urlParams = [];
+    for ($i = 0; $i < count($url) ; $i++) {
+      if (static::includeCurlyBrace($url[$i])) {
+        $_REQUEST[static::removeCurlyBrace($url[$i])] = $request[$i];
+        $urlParams[static::removeCurlyBrace($url[$i])] = $request[$i];
+      }
+    }
+    $this->urlParams = $urlParams;
+  }
+
+  private function executeAction()
+  {
+    // 返り値はViewのインスタンスにしたい。
+    if (is_callable($this->action)) {
+      $action = $this->action;
+      $function = new \ReflectionFunction($this->action);
+      if (empty($function->getParameters())) {
+        return $function->invoke();
+      } else {
+        $preparedParams = $this->prepareMethodParams($function->getParameters());
+        return $function->invokeArgs($preparedParams);
+      }
+    }
+
+    $splittedAction = preg_split('/@/', $this->action);
+    $controllerMethod = $splittedAction[1];
+    $controllerName = 'App\\Controllers\\'.$splittedAction[0];
+
+    $controller = new $controllerName();
+    $method = new \ReflectionMethod($controllerName, $controllerMethod);
+    if (empty($method->getParameters())) {
+      return $method->invoke($controller);
+    } else {
+      $preparedParams = $this->prepareMethodParams($method->getParameters());
+      return $method->invokeArgs($controller, $preparedParams);
+    }
+  }
+
   protected static function includeCurlyBrace($str) :bool
   {
     if (preg_match("#^{.+}#", $str)) {
@@ -178,18 +209,6 @@ class Route
     $str = rtrim($str, '}');
     $str = ltrim($str, '{');
     return $str;
-  }
-
-  protected function setUrlParams(Array $url, Array $request)
-  {
-    $urlParams = [];
-    for ($i = 0; $i < count($url) ; $i++) {
-      if (static::includeCurlyBrace($url[$i])) {
-        $_REQUEST[static::removeCurlyBrace($url[$i])] = $request[$i];
-        $urlParams[static::removeCurlyBrace($url[$i])] = $request[$i];
-      }
-    }
-    $this->urlParams = $urlParams;
   }
 
   protected function getUrlParams(Array $url, Array $request)

@@ -8,7 +8,7 @@ class UserController
 {
   public function showLoginForm()
   {
-    return view('users/login_form.php')->setLayout('layout/app.php')->render();
+    return view('users/login_form.php')->setLayout('layout/app.php');
   }
 
   public function login()
@@ -39,7 +39,7 @@ class UserController
 
   public function showRegisterForm()
   {
-    return view('users/register_form.php')->setLayout('layout/app.php')->render();
+    return view('users/register_form.php')->setLayout('layout/app.php');
   }
 
   public function register()

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Libs\Database\Model;
 use Libs\Database\Database;
+use Libs\Http\Session;
 
 class User extends Model
 {
@@ -32,10 +33,8 @@ class User extends Model
   }
 
   public static function isLogin()
-  { 
-    if (!isset($_SESSION))
-      session_start();
-    if (isset($_SESSION['user'])) {
+  {
+    if (Session::get('user')) {
       return true;
     }
     else {

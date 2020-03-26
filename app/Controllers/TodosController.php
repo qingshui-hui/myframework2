@@ -12,18 +12,18 @@ class TodosController
   public function __construct()
   {
     $view = new View();
-    $this->view = $view->setLayout('layout/todo.php')->setData([]);
+    $this->view = $view->setLayout('layout/todo.php');
   }
 
   public function index() 
   {
     $todos = Todo::all();
-    return $this->view->render('todos/index.php', ['todos' => $todos]);
+    return $this->view->set('todos/index.php', ['todos' => $todos]);
   }
 
   public function new()
   {
-    return $this->view->render('todos/new.php');
+    return $this->view->set('todos/new.php');
   }
 
   public function create()
@@ -37,13 +37,13 @@ class TodosController
   public function show()
   {
     $todo = Todo::find($_REQUEST['id']);
-    return $this->view->render('todos/show.php', ['todo' => $todo]);
+    return $this->view->set('todos/show.php', ['todo' => $todo]);
   }
 
   public function edit()
   {
     $todo = Todo::find($_REQUEST['id']);
-    return $this->view->render('todos/edit.php', ['todo' => $todo]);
+    return $this->view->set('todos/edit.php', ['todo' => $todo]);
   }
 
   public function update()

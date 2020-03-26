@@ -23,17 +23,14 @@ function env($key, $default = null)
   }
 }
 
-function view($content, Array $data = [])
+function view($content, Array $data = null, $layout = null)
 {
   $view = new View();
-  $view->setContent($content);
-  $view->setData($data);
+  $view->set($content, $data, $layout);
   return $view;
 }
 
-function render($content, Array $data = [])
+function redirect($path)
 {
-  // view() のショートカット
-  $view = new View();
-  $view->render($content, $data);
+  header("Location: {$path}");
 }
