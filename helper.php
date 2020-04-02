@@ -16,8 +16,8 @@ function printRouteList()
 
 function env($key, $default = null)
 {
-  if (isset($_ENV[$key])) {
-    return $_ENV[$key];
+  if (isset(ENV[$key])) {
+    return ENV[$key];
   } else {
     return $default;
   }

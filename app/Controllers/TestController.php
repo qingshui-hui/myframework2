@@ -25,7 +25,6 @@ class TestController
     
     $errors = new Errors();
     $request = new Request();
-    $request->session()->deleteOldRequest();
     return view('tests/test-validation.php',
               ['errors' => $errors, 'input' => $request]);
   }

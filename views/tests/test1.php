@@ -34,7 +34,7 @@ foreach ( glob( $pattern ) as $filename )
 $users = [
   [1, 'kusuda'],
   [2, 'honda'],
-  [3, 'yamane'],
+  [3, 'yamamoto'],
   [4, 'takanashi']
 ]
 ?>

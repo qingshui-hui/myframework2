@@ -25,6 +25,7 @@ class User extends Model
     if ($params['password'] == $userData['password']) {
       session_start();
       $_SESSION['user'] = $userData;
+      session_write_close();
       return true;
     }
     else {

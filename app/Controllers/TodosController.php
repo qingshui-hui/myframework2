@@ -12,7 +12,8 @@ class TodosController
   public function __construct()
   {
     $view = new View();
-    $this->view = $view->setLayout('layout/todo.php');
+    $isLogin = \App\Models\User::isLogin();
+    $this->view = $view->setLayout('layout/todo.php')->addData(['isLogin' => $isLogin]);
   }
 
   public function index() 

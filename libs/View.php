@@ -12,8 +12,14 @@ class View
   public function set($content, $data = null, $layout = null)
   {
     $this->content = self::PREFIX_PATH.$content;
-    if (isset($data)) $this->data = $data;
+    if (isset($data)) $this->data = array_merge($this->data, $data);
     if (isset($layout)) $this->layout = self::PREFIX_PATH.$layout;
+    return $this;
+  }
+
+  public function addData(Array $data)
+  {
+    $this->data = array_merge($this->data, $data);
     return $this;
   }
 

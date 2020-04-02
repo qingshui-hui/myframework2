@@ -45,13 +45,7 @@ class Request
 
   public static function old($key)
   {
-    session_start([
-      'read_and_close' => true
-    ]);
-    if (isset($_SESSION['request'])) {
-      $oldRequest = $_SESSION['request'];
-      return $oldRequest->get($key);
-    }
+    Session::get('request');
   }
 
   public static function session()

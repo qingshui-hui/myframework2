@@ -9,7 +9,7 @@ class Session
     // $this->session = $_SESSION;
   }
 
-  public static function get($key, $else = null)
+  public static function get($key, $default = null)
   {
     session_start();
     if (isset($_SESSION[$key])) {
