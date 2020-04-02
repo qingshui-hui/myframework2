@@ -2,10 +2,12 @@
 
 namespace App\Middleware;
 use App\Models\User;
+use Libs\Http\Session;
 
 class Authenticate
 {
-  public function default()
+  // ルーティングの設定により、default が呼び出される
+  public function default() :bool
   {
     return $this->RedirectIfNotLogin();
   }
@@ -13,12 +15,9 @@ class Authenticate
   private function RedirectIfNotLogin() :bool
   {
     if (!User::isLogin()) {
-      session_start();
-      $_SESSION["stored_url"] = $_SERVER['REQUEST_URI'];
-      session_write_close();
+      Session::push("stored_url", $_SERVER['REQUEST_URI']);
       header('Location: /login');
       return false;
-
     } else {
       return true;
     }

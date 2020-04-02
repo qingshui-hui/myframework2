@@ -22,7 +22,6 @@ class TestController
 
   public function showValidationForm()
   {
-    
     $errors = new Errors();
     $request = new Request();
     return view('tests/test-validation.php',
@@ -51,8 +50,8 @@ class TestController
   public function testRedirectForm()
   {
     // エラーを表示したいフォーム側で次の二つを設定。
-    $errors = Session::getFlashErrors();
-    $request = Session::getFlashRequest();
+    $errors = Session::getFlash('errors', new Errors());
+    $request = Session::getFlash('request', new Request());
     return view('tests/test-redirect.php', 
           ['errors' => $errors, 'request' => $request]);
   }
@@ -68,7 +67,7 @@ class TestController
       // 一時的に保存して、リダイレクト先に渡す。
       Session::useOnlyNext('request',$request);
       Session::useOnlyNext('errors', $validator->getErrors());
-      return redirect('/test-redirect');
+      header("Location: /test-redirect");
     } else {
       print_r($validator->getValidated());
       echo "<p><a href='/test1'>back</a></p>";

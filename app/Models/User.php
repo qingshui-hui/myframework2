@@ -23,9 +23,7 @@ class User extends Model
     $query = "SELECT * FROM users WHERE email = :email LIMIT 1;";
     $userData = $db->query($query, ['email' => $params['email']])[0];
     if ($params['password'] == $userData['password']) {
-      session_start();
-      $_SESSION['user'] = $userData;
-      session_write_close();
+      Session::push('user', $userData);
       return true;
     }
     else {
