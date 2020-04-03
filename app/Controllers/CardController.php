@@ -20,6 +20,7 @@ class CardController
     $card = new Card();
     $card->create($params);
     header("Location: /boards");
+    exit();
   }
 
   public function destroy()
@@ -28,5 +29,6 @@ class CardController
     $card = new Card();
     $card->destroy($id);
     header("Location: /boards");
+    exit();
   }
 }

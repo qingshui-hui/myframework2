@@ -12,18 +12,16 @@ class User extends Model
   protected $primaryKey = ['id'];
   protected $properties = ['id', 'name', 'email', 'password', 'created_at', 'updated_at'];
 
-  public function __construct()
-  {
-    parent::__construct();
-  }
-
   public static function authenticateUser($params) :bool
   {
     $db = Database::getInstance();
     $query = "SELECT * FROM users WHERE email = :email LIMIT 1;";
     $userData = $db->query($query, ['email' => $params['email']])[0];
     if ($params['password'] == $userData['password']) {
-      Session::push('user', $userData);
+      // ログインの度にsession id が変わる
+      // セッションハイジャック対策
+      session_regenerate_id(true);
+      Session::put('user', $userData);
       return true;
     }
     else {

@@ -7,12 +7,7 @@ require_once "vendor/autoload.php";
 use Libs\Routing\RouteList;
 use Libs\Http\Session;
 
-session_start();
-
-if (Session::get('flashCount', 0) > 0) {
-  Session::push('flash', null);
-}
-Session::incrementFlashCount();
+Session::start();
 
 $routeList = RouteList::getInstance();
 if ($routeList->RouteIsEmpty()) {

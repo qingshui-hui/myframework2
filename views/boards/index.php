@@ -22,7 +22,7 @@
             <ul class="cards sortable" id="sortable-<?=$board->id?>">
               <?php foreach($board->cards() as $card): ?>
                 <li class="card draggable">
-                  <span><?= $card->title ?></span>
+                  <span><?= h($card->title) ?></span>
                   <a href="/cards/<?=$card->id?>/destroy">
                     <i class="fas fa-times"></i>
                   </a>

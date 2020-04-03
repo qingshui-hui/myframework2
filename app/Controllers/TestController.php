@@ -68,6 +68,7 @@ class TestController
       Session::useOnlyNext('request',$request);
       Session::useOnlyNext('errors', $validator->getErrors());
       header("Location: /test-redirect");
+      exit();
     } else {
       print_r($validator->getValidated());
       echo "<p><a href='/test1'>back</a></p>";

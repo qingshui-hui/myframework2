@@ -22,6 +22,7 @@ class BoardController
     $board = new Board;
     $board->create($_REQUEST);
     header("Location: /boards");
+    exit();
   }
 
   public function show()

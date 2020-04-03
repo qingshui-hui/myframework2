@@ -10,11 +10,6 @@ class Todo extends Model
   protected $primaryKey = ['id'];
   protected $properties = ['id', 'content', 'created_at', 'updated_at'];
 
-  public function __construct()
-  {
-    parent::__construct();
-  }
-
   public function daysFromCreation()
   {
     $time_from = strtotime($this->created_at);

@@ -1,6 +1,10 @@
 <?php
 
 ini_set('display_errors', 1);
+ini_set('session.cookie_lifetime', 1800);
+// ブラウザを一度閉じても30分ログインしたままになる設定
+// ini_set('session.cookie_httponly', 1);
+
 
 define('ENV', [
     'DSN' => 'mysql:host=db;dbname=dev_db;charset=utf8mb4',

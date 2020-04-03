@@ -4,6 +4,8 @@ namespace App\Controllers;
 use App\Models\Todo;
 use App\Middleware\Authenticate;
 use Libs\View;
+use Libs\Http\Session;
+use Libs\Http\Request;
 
 class TodosController 
 {
@@ -13,6 +15,7 @@ class TodosController
   {
     $view = new View();
     $isLogin = \App\Models\User::isLogin();
+    // layout用のデータはここで追加する必要がある
     $this->view = $view->setLayout('layout/todo.php')->addData(['isLogin' => $isLogin]);
   }
 
@@ -24,41 +27,48 @@ class TodosController
 
   public function new()
   {
-    return $this->view->set('todos/new.php');
+    $csrfToken = Session::generateCsrfToken();
+    return $this->view->set('todos/new.php', ['csrfToken' => $csrfToken]);
   }
 
-  public function create()
+  public function create(Request $request)
   {
+    if ($_REQUEST['csrfToken'] !== Session::get('csrfToken')) {
+      echo "不正なリクエストです";
+    }
     $todo = new Todo();
-    $params = $_REQUEST;
+    $params = $request->all();
     $todo->create($params);
     header("Location: /todos");
+    exit();
   }
 
-  public function show()
+  public function show($id)
   {
-    $todo = Todo::find($_REQUEST['id']);
+    $todo = Todo::find($id);
     return $this->view->set('todos/show.php', ['todo' => $todo]);
   }
 
-  public function edit()
+  public function edit($id)
   {
-    $todo = Todo::find($_REQUEST['id']);
+    $todo = Todo::find($id);
     return $this->view->set('todos/edit.php', ['todo' => $todo]);
   }
 
-  public function update()
+  public function update(Request $request, $id)
   {
-    $params = $_REQUEST;
+    $params = $request->all();
     $todo = new Todo();
-    $todo->update($params, $params['id']);
-    header("Location: /todos/".$params['id']);
+    $todo->update($params, $id);
+    header("Location: /todos/".$id);
+    exit();
   }
 
-  public function destroy()
+  public function destroy($id)
   {
     $todo = new Todo();
-    $todo->destroy($_REQUEST['id']);
+    $todo->destroy($id);
     header("Location: /todos");
+    exit();
   }
 }
