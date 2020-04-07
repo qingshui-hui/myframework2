@@ -25,6 +25,12 @@
       <p><?= $error ?></p>
     <?php endforeach; ?>
   </div>
+  <div>id
+    <input type="text" name="id" id="id" value="<?=$request->get('id')?>">
+    <?php foreach($errors->get('id') as $error): ?>
+      <p><?= $error ?></p>
+    <?php endforeach; ?>
+  </div>
   <div>
     <button type="submit">テスト</button>
   </div>

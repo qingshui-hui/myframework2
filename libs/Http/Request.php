@@ -3,30 +3,28 @@
 
 namespace Libs\Http;
 
+use Libs\Support\ArrayUtil;
+
 class Request
 {
-  protected $request;
+  protected $data;
   protected $files;
 
   public function __construct()
   {
-    $this->request = $_REQUEST;
+    $this->data = $_REQUEST;
     $this->files = $_FILES;
     $this->session = new Session();
   }
 
   public function all()
   {
-    return $this->request;
+    return $this->data;
   }
 
   public function get($key)
   {
-    if (isset($this->request[$key])) {
-      return $this->request[$key];
-    } else {
-      return null;
-    }
+    return ArrayUtil::get_deep($this->data, $key);
   }
 
   public function files()

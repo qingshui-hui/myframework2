@@ -9,12 +9,16 @@
     <?=$todo->content?>
   </li>
   <li>
-    <span>作成日時 : </span>
-    <?=$todo->created_at?>
+    <span>期限 : </span>
+    <?=$todo->deadline()?>
   </li>
   <li>
-    <span>経過日数 : </span>
-    <?=$todo->daysFromCreation()?>
+    <span>担当者 : </span>
+    <?=$todo->user()->name?>
+  </li>
+  <li>
+    <span>作成日時 : </span>
+    <?=date('Y/m/d H:i', strtotime($todo->created_at))?>
   </li>
 </ul>
 <div class="links">

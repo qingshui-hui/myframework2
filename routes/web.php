@@ -3,6 +3,7 @@
 use Libs\Routing\Route;
 use Libs\Http\Request;
 // Route::get('/todos/new', 'TodosController@new')->middleware('Authenticate');
+Route::get('/todos/deleteOverdue', 'TodosController@deleteOverdue');
 Route::resource('todos', 'TodosController', [
   'only' => ['new', 'create', 'edit', 'update', 'destroy'],
   'middleware' => 'Authenticate'
@@ -16,8 +17,8 @@ Route::resource('boards', 'BoardController', [
   'only' => ['index', 'new', 'create', 'show']
 ]);
 
-Route::get('/boards/{board}/cards/new', 'CardController@new');
-Route::post('/boards/{board}/cards', 'CardController@create');
+Route::get('/boards/{boardId}/cards/new', 'CardController@new');
+Route::post('/boards/{boardId}/cards', 'CardController@create');
 Route::get('/cards/{id}/destroy', 'CardController@destroy');
 
 Route::get('/login', 'UserController@showLoginForm');

@@ -11,7 +11,8 @@ class Validator
     'required' => 'checkExistence',
     'unique' => 'checkUniqueness',
     'max' => 'checkMax',
-    'nullable' => 'nullable'
+    'min' => 'checkMin',
+    'nullable' => 'nullable',
   ];
   private  static $instance = null;
   private $input = null;
@@ -31,7 +32,7 @@ class Validator
     // $thisの代わりに、self::$instanceを使うという感じ
     self::init();
     self::$instance->input = $input;
-    // self::$instance->errors = Errors::makeEmptyErrors(array_keys($input));
+    
     foreach($validations as $key => $validation) {
       $checkList = preg_split("#\|#", $validation);
       $checkListB = array_map(function($a){return preg_split("#:#", $a);}, $checkList);
@@ -79,10 +80,23 @@ class Validator
 
   // ---- private methods -------
 
+  private function exist($value) :bool
+  {
+    if (!isset($value)) {
+      return false;
+    } else if (is_string($value)) {
+      $value = trim($value);
+      if ($value === "") {
+        return false;
+      }
+    }
+    return true;
+  }
+
   private function checkExistence($key) :bool
   {
-    if (empty($this->input[$key])) {
-      $this->errors->add($key, "{$key}が入力されていません");
+    if (!$this->exist($this->input[$key])) {
+      $this->errors->put("{$key}.required", "{$key}が入力されていません");
       return false;
     } else {
       $this->validatedInput[$key] = $this->input[$key];
@@ -93,12 +107,19 @@ class Validator
   private function checkUniqueness($key, $dataTable) :bool
   {
     $db = Database::getInstance();
-    $query = "SELECT * FROM {$dataTable} WHERE {$key} = :{$key};";
-    $params = [$key => $this->input[$key]];
+    if (isset($this->input['id'])) {
+      // id が渡されたときは、そのidのレコードについては唯一性のチェックから外すように修正
+      $id = intval($this->input['id']);
+      $query = "SELECT * FROM {$dataTable} WHERE {$key} = :{$key} AND NOT id = :id;";
+      $params = [$key => $this->input[$key], 'id' => $id];
+    } else {
+      $query = "SELECT * FROM {$dataTable} WHERE {$key} = :{$key};";
+      $params = [$key => $this->input[$key]];
+    }
     $data = $db->query($query, $params);
 
-    if (!empty($data)) {
-      $this->errors->add($key, "この{$key}はすでに使用されています");
+    if (count($data) > 0) {
+      $this->errors->put("{$key}.unique", "この{$key}はすでに使用されています");
       return false;
     } else {
       $this->validatedInput[$key] = $this->input[$key];
@@ -108,11 +129,25 @@ class Validator
 
   private function checkMax($key, $intMax) :bool
   {
-    if (empty($this->input[$key])) {
+    if (!$this->exist($this->input[$key])) {
       return true;
     }
-    if (strlen($this->input[$key]) > $intMax) {
-      $this->errors->add($key, "{$key}の最大文字数は{$intMax}です");
+    if (mb_strlen($this->input[$key]) > $intMax) {
+      $this->errors->put("{$key}.max", "{$key}の最大文字数は{$intMax}です");
+      return false;
+    } else {
+      $this->validatedInput[$key] = $this->input[$key];
+      return true;
+    }
+  }
+
+  private function checkMin($key, $intMin) :bool
+  {
+    if (!$this->exist($this->input[$key])) {
+      return true;
+    }
+    if (mb_strlen($this->input[$key]) < $intMin) {
+      $this->errors->put("{$key}.min", "{$key}の最小文字数は{$intMin}です");
       return false;
     } else {
       $this->validatedInput[$key] = $this->input[$key];
@@ -122,7 +157,7 @@ class Validator
 
   private function nullable($key) :bool
   {
-    if (isset($this->input[$key])) {
+    if (isset($this->input[$key] )) {
       $this->validatedInput[$key] = $this->input[$key];
     }
     return true;

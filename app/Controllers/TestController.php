@@ -32,7 +32,7 @@ class TestController
   {
     $validator = Validator::make($request->all(), [
       'email' => 'required|unique:users',
-      'nickname' => 'nullable|max:10',
+      'nickname' => 'nullable|min:4|max:10',
       'title' => 'required'
     ]);
     if ($validator->fails()) {
@@ -50,23 +50,21 @@ class TestController
   public function testRedirectForm()
   {
     // エラーを表示したいフォーム側で次の二つを設定。
-    $errors = Session::getFlash('errors', new Errors());
-    $request = Session::getFlash('request', new Request());
+    $errors = Session::getAndForget('errors', new Errors());
+    $request = Session::getAndForget('request', new Request());
     return view('tests/test-redirect.php', 
           ['errors' => $errors, 'request' => $request]);
   }
 
-  public function testRedirect(Request $request)
+  public function testRedirect()
   {
-    $validator = Validator::make($request->all(), [
-      'email' => 'required|unique:users',
-      'nickname' => 'nullable|max:10',
-      'title' => 'required'
-    ]);
+    // RequestとValidatorを一つにまとめたようなクラス
+    $customRequest = new \App\Requests\TestRedirectRequest();
+    $validator = $customRequest->validator;
     if ($validator->fails()) {
       // 一時的に保存して、リダイレクト先に渡す。
-      Session::useOnlyNext('request',$request);
-      Session::useOnlyNext('errors', $validator->getErrors());
+      Session::put('request',$customRequest->request);
+      Session::put('errors', $customRequest->errors);
       header("Location: /test-redirect");
       exit();
     } else {

@@ -49,7 +49,7 @@ class View
     foreach ($this->data as $key => $val) {
       $$key = $val;
     }
-    if (empty($this->layout)) {
+    if (!isset($this->layout)) {
       require_once($this->content);
     } else {
       // layoutから中身を呼び出す時、$view->yield()とする。

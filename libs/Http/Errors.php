@@ -2,34 +2,31 @@
 
 namespace Libs\Http;
 
+use Libs\Support\ArrayUtil;
+
 class Errors
 {
-  private static $errors;
+  private $data = [];
 
-  public static function makeEmptyErrors(Array $keyList)
+  public function get($keySet) :Array
   {
-    self::$errors = new Errors();
-    foreach($keyList as $key) {
-      self::$errors->$key = [];
-    }
-    return self::$errors;
+    return ArrayUtil::get_deep($this->data, $keySet, []);
   }
 
-  public function add($key, $message)
+  public function put($keySet, $value)
   {
-    if (empty($this->$key)) {
-      $this->$key = [$message];
+    $this->data = ArrayUtil::put_deep($this->data, $keySet, $value);
+  }
+
+  public function changeMessage($tag, $message)
+  {
+    // $tag = 'email.required' のというような文字列のみを想定
+    // エラーの構造は、$this->data = ['email => ['required' => 'error message', 'max' => 'error message']]
+    if (substr_count($tag, '.') != 1) {
+      return;
     } else {
-      array_push($this->$key, $message);  
+      $this->put($tag, $message);
     }
   }
 
-  public function get($key) :Array
-  {
-    if (isset($this->$key)) {
-      return $this->$key;
-    } else {
-      return [];
-    }
-  }
 }

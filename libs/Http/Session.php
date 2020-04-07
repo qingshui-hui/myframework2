@@ -2,74 +2,35 @@
 
 namespace Libs\Http;
 
+use Libs\Support\ArrayUtil;
+
 class Session
 {
   public static function start()
   {
     session_start();
-    
-    if (Session::get('flashCount', 0) > 0) {
-      Session::put('flash', null);
-    }
-    Session::incrementFlashCount();
   }
 
   public static function get($name, $default = null)
   {
-    // Session::get('contacts.name'); //$_SESSION['contacts']['name']の値が返る
-    $keys = explode('.', $name);
-
-    if (isset($_SESSION[$keys[0]])) {
-      $tmpData = $_SESSION[array_shift($keys)];
-      foreach($keys as $key) {
-          if (isset($tmpData[$key])) {
-              $tmpData = $tmpData[$key];
-          } else {
-              // 途中で存在しないキーがあった場合、defaultを返してループをぬける。
-              return $default;
-          };
-      }
-      return $tmpData;
-    } else {
-      return $default;
-    }
+    return ArrayUtil::get_deep($_SESSION, $name, $default);
   }
 
   public static function put($name, $val)
   {
-    $keys = explode('.', $name);
-    $keys = array_reverse($keys);
-    // 後ろのキーから順に詰めていって、多階層の配列を作る
-    $tmpData = $val;
-    foreach ($keys as $key) {
-        $last = $tmpData;
-        $tmpData = [];
-        $tmpData[$key] = $last;
-    }
-    $_SESSION = array_merge($_SESSION, $tmpData);
+    $_SESSION = ArrayUtil::put_deep($_SESSION, $name, $val);
   }
 
-  public static function useOnlyNext($key, $val)
+  public static function forget($name)
   {
-    $_SESSION['flashCount'] = 0;
-    $_SESSION['flash'][$key] = $val;
+    ArrayUtil::unset_deep($_SESSION, $name);
   }
 
-  public static function getFlash($key, $default = null)
+  public static function getAndForget($name, $default)
   {
-    if (isset($_SESSION['flash'])) {
-      if (isset($_SESSION['flash'][$key])) {
-        return $_SESSION['flash'][$key];
-      }
-    }
-    return $default;
-  }
-
-  public static function incrementFlashCount()
-  {
-    if (isset($_SESSION['flashCount'])) {
-      $_SESSION['flashCount'] += 1;
-    }
+    $return = self::get($name, $default);
+    self::forget($name);
+    return $return;
   }
 
   public static function destroy()
@@ -85,7 +46,7 @@ class Session
   {
     $tokenByte = openssl_random_pseudo_bytes(16);
     $csrfToken = bin2hex($tokenByte);
-    static::put('csrfToken', $csrfToken);
+    self::put('csrfToken', $csrfToken);
     return $csrfToken;
   }
 }

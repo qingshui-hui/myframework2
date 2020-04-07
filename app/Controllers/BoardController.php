@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Board;
+use Libs\Http\Request;
 
 class BoardController
 {
@@ -17,17 +18,17 @@ class BoardController
     return view('boards/new.php');
   }
 
-  public function create()
+  public function create(Request $request)
   {
     $board = new Board;
-    $board->create($_REQUEST);
+    $board->create($request->all());
     header("Location: /boards");
     exit();
   }
 
-  public function show()
+  public function show($id)
   {
-    echo $_REQUEST['id'];
-    print_r(Board::find($_REQUEST['id'])->cards());
+    echo $id;
+    print_r(Board::find($id)->cards());
   }
 }

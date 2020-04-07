@@ -10,7 +10,8 @@ print_r($todo);
 
 $result = $db->query("SHOW TABLES LIKE :table", ['table' => 'users']);
 print_r($result);
-
+$dbUsers = $db->query("select * from users;");
+print_r($dbUsers);
 
 // セッション管理開始
  
@@ -65,3 +66,10 @@ $users = [
   <?php endforeach; ?>
   <input type="submit" value="送信">
 </form>
+
+<script>
+const date2 = new Date('1995-12-17T03:24:00');
+const date3 = new Date('1995/12/17');
+console.log(date2);
+console.log(date3)
+</script>

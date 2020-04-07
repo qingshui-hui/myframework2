@@ -21,4 +21,11 @@
   </div>
   <?php require_once('views/layout/footer.php'); ?>
 </body>
-</heml>
+</html>
+
+<style>
+header {
+  margin: 0 0 30px 0;
+  background-color: lightgray;
+}
+</style>

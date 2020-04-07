@@ -48,8 +48,11 @@ class Model {
     $this->db->execute($query, $permittedParams);
   }
 
-  public function destroy($id)
+  public function destroy($id = null)
   {
+    if (!isset($id)) {
+      $id = $this->id;
+    }
     $table = static::$table;
     $query = "DELETE FROM {$table} WHERE id = :id";
     $this->db->execute($query, ['id' => $id]);

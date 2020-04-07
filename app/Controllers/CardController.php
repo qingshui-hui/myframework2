@@ -4,28 +4,28 @@ namespace App\Controllers;
 
 use App\Models\Card;
 use App\Models\Board;
+use Libs\Http\Request;
 
 class CardController
 {
-  public function new()
+  public function new($boardId)
   {
-    $board = Board::find($_REQUEST['board']);
+    $board = Board::find($boardId);
     return view('cards/new.php', ['board' => $board]);
   }
 
-  public function create()
+  public function create(Request $request)
   {
-    $params = $_REQUEST;
-    $params['board_id'] = $_REQUEST['board'];
+    $params = $request->all();
+    $params['board_id'] = $request->get('boardId');
     $card = new Card();
     $card->create($params);
     header("Location: /boards");
     exit();
   }
 
-  public function destroy()
+  public function destroy($id)
   {
-    $id = $_REQUEST['id'];
     $card = new Card();
     $card->destroy($id);
     header("Location: /boards");
