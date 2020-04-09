@@ -9,15 +9,17 @@
   </head>
   <body>
     <header>
-      <h3>ボードリスト<a href="/boards/new">ボードを追加する</a></h3>
+      <h3>ボードリスト<a href="/boards/create">ボードを追加する</a></h3>
     </header>
     <div class="content_wrapper">
       <div class="boards">
         <?php foreach ($boards as $board): ?>
           <div class="board">
-            <h3><?=h($board->title)?></h3>
+            <h3>
+              <a href="/boards/<?=$board->id?>"><?=h($board->title)?></a>
+            </h3>
             <div class="addcard">
-              <a href="/boards/<?=$board->id?>/cards/new">カードを追加する</a>
+              <a href="/boards/<?=$board->id?>/cards/create">カードを追加する</a>
             </div>
             <ul class="cards sortable" id="sortable-<?=$board->id?>">
               <?php foreach($board->cards() as $card): ?>

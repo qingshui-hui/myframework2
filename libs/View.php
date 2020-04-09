@@ -23,6 +23,7 @@ class View
     return $this;
   }
 
+  // データを空にしたいときなどに使う
   public function setData(Array $data)
   {
     $this->data = $data;
@@ -52,7 +53,7 @@ class View
     if (!isset($this->layout)) {
       require_once($this->content);
     } else {
-      // layoutから中身を呼び出す時、$view->yield()とする。
+      // layoutからcontentを呼び出す時、$view->yield()と記述するため、layoutに、viewのインスタンスを渡す。
       $view = $this;
       require_once($this->layout);
     }

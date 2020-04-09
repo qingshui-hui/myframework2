@@ -5,8 +5,8 @@ namespace Libs\Routing;
 use Libs\Routing\RouteList;
 use Libs\Http\Request;
 
-class Route
 // middlewareについてはdefault()メソッドを呼ぶ executeRequest()を参照
+class Route
 {
   private $url;
   private $requestMethod;
@@ -33,7 +33,7 @@ class Route
     if (isset($option['only'])) {
       $only = $option['only'];
     } else {
-      $only = ["index", "new", "create", "show", "edit", "update", "destroy"];
+      $only = ["index", "create", "store", "show", "edit", "update", "destroy"];
     }
     if (!isset($option['middleware'])) {
       $middleware = null;
@@ -42,10 +42,10 @@ class Route
     }
     if (in_array("index", $only))
       static::get("/{$name}", $controllerName."@index", $middleware);
-    if (in_array("new", $only))
-      static::get("/{$name}/new", $controllerName."@new", $middleware);
     if (in_array("create", $only))
-      static::post("/{$name}", $controllerName."@create", $middleware);
+      static::get("/{$name}/create", $controllerName."@create", $middleware);
+    if (in_array("store", $only))
+      static::post("/{$name}", $controllerName."@store", $middleware);
 
     if (in_array("show", $only))
       static::get("/{$name}/{id}", $controllerName."@show", $middleware);
@@ -139,7 +139,7 @@ class Route
 
   private function passMiddleware() :bool
   {
-    if (!empty($this->middleware)) {
+    if (isset($this->middleware) && $this->middleware !== "") {
       $middlewareName = 'App\\Middleware\\'.$this->middleware;
       $middleware = new $middlewareName();
       if (!$middleware->default()) {
@@ -171,7 +171,7 @@ class Route
     if (is_callable($this->action)) {
       $action = $this->action;
       $function = new \ReflectionFunction($this->action);
-      if (empty($function->getParameters())) {
+      if (count($function->getParameters()) < 1) {
         return $function->invoke();
       } else {
         $preparedParams = $this->prepareMethodParams($function->getParameters());
@@ -185,7 +185,7 @@ class Route
 
     $controller = new $controllerName();
     $method = new \ReflectionMethod($controllerName, $controllerMethod);
-    if (empty($method->getParameters())) {
+    if (count($method->getParameters()) < 1) {
       return $method->invoke($controller);
     } else {
       $preparedParams = $this->prepareMethodParams($method->getParameters());

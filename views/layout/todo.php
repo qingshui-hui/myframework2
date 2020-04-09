@@ -6,11 +6,12 @@
 </head>
 <body>
   <header>
-    <a href="/todos/new">add todo</a> |
+    <a href="/todos/create">add todo</a> |
     <a href="/todos">todo list</a> |
     <a href="/boards">boards</a> |
     <?php if ($isLogin):?>
-      <a href="/logout">ログアウト</a>
+      <a href="/logout">ログアウト</a> |
+      <a href="/users/show"> アカウント</a>
     <?php else: ?>
       <a href="/login">ログイン</a>
     <?php endif; ?>

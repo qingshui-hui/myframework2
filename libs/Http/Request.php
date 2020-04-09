@@ -22,9 +22,37 @@ class Request
     return $this->data;
   }
 
-  public function get($key)
+  public function isset($key)
   {
-    return ArrayUtil::get_deep($this->data, $key);
+    // ["", null] はセットされていないとみなす。
+    if ($this->get($key) === null) {
+      return false;
+    } else {
+      if ($this->get($key) === "") {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public function get($key, $default = null)
+  {
+    return ArrayUtil::get_deep($this->data, $key, $default);
+  }
+
+  public function put($key, $val)
+  {
+    $this->data = ArrayUtil::put_deep($this->data, $key, $val);
+  }
+
+  public function forget($key)
+  {
+    return ArrayUtil::unset_deep($this->data, $key);
+  }
+
+  public function setData(array $data)
+  {
+    $this->data = $data;
   }
 
   public function files()

@@ -72,4 +72,15 @@ class TestController
       echo "<p><a href='/test1'>back</a></p>";
     }
   }
+
+  public function testApi()
+  {
+    // jquery ajax のpost
+    // $_REQUEST で、javascripから送られたデータを受け取れる。
+    $name = "aaa";
+    $response = json_encode($_REQUEST);
+    header("Content-Type: application/json; charset=utf-8");
+    echo $response;
+    exit();
+  }
 }

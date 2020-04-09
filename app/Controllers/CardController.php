@@ -8,13 +8,19 @@ use Libs\Http\Request;
 
 class CardController
 {
-  public function new($boardId)
+  public function index()
   {
-    $board = Board::find($boardId);
-    return view('cards/new.php', ['board' => $board]);
+    $cards = Card::all();
+    return view('cards/index.php', ['cards' => $cards]);
   }
 
-  public function create(Request $request)
+  public function create($boardId)
+  {
+    $board = Board::find($boardId);
+    return view('cards/create.php', ['board' => $board]);
+  }
+
+  public function store(Request $request)
   {
     $params = $request->all();
     $params['board_id'] = $request->get('boardId');

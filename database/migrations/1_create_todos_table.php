@@ -13,7 +13,7 @@ class CreateTodosTable extends Migration
       `id` bigint(20) NOT NULL AUTO_INCREMENT,
       `content` varchar(255) DEFAULT NULL,
       `user_id` int(11) DEFAULT NULL,
-      `deadline` varchar(100) DEFAULT NULL,
+      `deadline` datetime DEFAULT NULL,
       `created_at` datetime DEFAULT NULL,
       `updated_at` datetime DEFAULT NULL,
       PRIMARY KEY (`id`)

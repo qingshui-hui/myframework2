@@ -12,16 +12,20 @@ class User extends Model
   protected $primaryKey = ['id'];
   protected $properties = ['id', 'name', 'email', 'password', 'created_at', 'updated_at'];
 
-  public static function authenticateUser($params) :bool
+  public static function authenticateUser($request) :bool
   {
     $db = Database::getInstance();
     $query = "SELECT * FROM users WHERE email = :email LIMIT 1;";
-    $userData = $db->query($query, ['email' => $params['email']])[0];
-    if ($params['password'] == $userData['password']) {
+    $userData = $db->query($query, ['email' => $request->get('email')])[0];
+    if (!isset($userData)) {
+      return false;
+    }
+    if ($request->get('password') == $userData['password']) {
       // ログインの度にsession id が変わる
       // セッションハイジャック対策
       session_regenerate_id(true);
-      Session::put('user', $userData);
+      Session::put('user', User::arrayToObject($userData));
+      Session::put('login', true);
       return true;
     }
     else {
@@ -31,7 +35,7 @@ class User extends Model
 
   public static function isLogin()
   {
-    if (Session::get('user')) {
+    if (Session::get('login')) {
       return true;
     }
     else {

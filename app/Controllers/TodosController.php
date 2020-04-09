@@ -2,10 +2,14 @@
 
 namespace App\Controllers;
 use App\Models\Todo;
+use App\Models\User;
 use App\Middleware\Authenticate;
+use App\Requests\TodosCreateRequest;
+use App\Requests\TodosSearchRequest;
 use Libs\View;
 use Libs\Http\Session;
 use Libs\Http\Request;
+use Libs\Http\Errors;
 use Libs\Http\Validator;
 // メソッドの第一引数にRequestクラスを入れるとroutingのメソッド呼び出し時に注入してくれる
 
@@ -21,38 +25,49 @@ class TodosController
     $this->view = $view->setLayout('layout/todo.php')->addData(['isLogin' => $isLogin]);
   }
 
-  public function index() 
+  public function search()
   {
-    $todos = Todo::all();
-    return $this->view->set('todos/index.php', ['todos' => $todos]);
+    $customRequest = new TodosSearchRequest();
+    $todos = $customRequest->getTodos();
+    $users = User::all();
+    $request = new Request();
+    return $this->view->set('todos/search.php', ['todos' => $todos, 'users' => $users, 'request' => $request]);
   }
 
-  public function new()
+  public function index() 
+  {
+    $todos = Todo::allWithUsers();
+    $users = User::all();
+    return $this->view->set('todos/index.php', ['todos' => $todos, 'users' => $users]);
+  }
+
+  public function create()
   {
     $users = \App\Models\User::all();
     $csrfToken = Session::generateCsrfToken();
-    return $this->view->set('todos/new.php', ['csrfToken' => $csrfToken, 'users' => $users]);
+    $errors = Session::getAndForget('errors', new Errors());
+    $request = Session::getAndForget('request', new Request);
+    return $this->view->set('todos/create.php', ['csrfToken' => $csrfToken, 'users' => $users, 'errors' => $errors, 'request' => $request]);
   }
 
-  public function create(Request $request)
+  public function store(Request $request)
   {
-    if ($_REQUEST['csrfToken'] !== Session::get('csrfToken')) {
-      echo "不正なリクエストです";
+    // if ($_REQUEST['csrfToken'] !== Session::get('csrfToken')) {
+    //   echo "不正なリクエストです";
+    //   exit();
+    // }
+    $customRequest = new TodosCreateRequest();
+    if ($customRequest->validator->fails()) {
+      Session::put('errors', $customRequest->errors);
+      Session::put('request', $customRequest->request);
+      header("Location: /todos/create");
+      exit();
+    } else {
+      $params = $customRequest->modifiedRequest;
+      (new Todo)->create($params);
+      header("Location: /todos");
       exit();
     }
-    $validator = Validator::make($request->all(), ['content' => 'required', 'user_id' => 'required', 'date' => 'required']);
-    if ($validator->fails()) {
-      header("Location: /todos/new");
-      exit();
-    }
-    $todo = new Todo();
-    $params = $request->all();
-    $deadline = $request->get('date').' '.$request->get('hour').':'.$request->get('minute');
-    $params['deadline'] = $deadline;
-    // print_r($params);
-    $todo->create($params);
-    header("Location: /todos");
-    exit();
   }
 
   public function show($id)
@@ -64,36 +79,36 @@ class TodosController
   public function edit($id)
   {
     $todo = Todo::find($id);
-    $users = \App\Models\User::all();
+    $users = User::all();
     $csrfToken = Session::generateCsrfToken();
-    return $this->view->set('todos/edit.php', ['todo' => $todo, 'users' => $users, 'csrfToken' => $csrfToken]);
+    $errors = Session::getAndForget('errors', new Errors());
+    $request = Session::getAndForget('request', $todo->convertToRequest());
+    return $this->view->set('todos/edit.php', ['todo' => $todo, 'users' => $users, 'csrfToken' => $csrfToken, 'errors' => $errors, 'request' => $request]);
   }
 
   public function update(Request $request, $id)
   {
-    if ($_REQUEST['csrfToken'] !== Session::get('csrfToken')) {
-      echo "不正なリクエストです";
-      exit();
-    }
-    $validator = Validator::make($request->all(), ['content' => 'required', 'user_id' => 'required', 'date' => 'required']);
-    if ($validator->fails()) {
+    // if ($_REQUEST['csrfToken'] !== Session::get('csrfToken')) {
+    //   echo "不正なリクエストです";
+    //   exit();
+    // }
+    $customRequest = new TodosCreateRequest();
+    if ($customRequest->validator->fails()) {
+      Session::put('errors', $customRequest->errors);
+      Session::put('request', $customRequest->request);
       header("Location: /todos/{$id}/edit");
       exit();
+    } else {
+      $params = $customRequest->modifiedRequest;
+      (new Todo)->update($params, $id);
+      header("Location: /todos/".$id);
+      exit();
     }
-    $params = $request->all();
-    $deadline = $request->get('date').' '.$request->get('hour').':'.$request->get('minute');
-    $params['deadline'] = $deadline;
-
-    $todo = Todo::find($id);
-    $todo->update($params, $id);
-    header("Location: /todos/".$id);
-    exit();
   }
 
   public function destroy($id)
   {
-    $todo = Todo::find($id);
-    $todo->destroy();
+    (new Todo)->destroy($id);
     header("Location: /todos");
     exit();
   }

@@ -1,7 +1,7 @@
 <?php
 
 ini_set('display_errors', 1);
-ini_set('session.cookie_lifetime', 1800);
+// ini_set('session.cookie_lifetime', 1800);
 // ブラウザを一度閉じても30分ログインしたままになる設定
 // ini_set('session.cookie_httponly', 1);
 date_default_timezone_set('Asia/Tokyo');

@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\User;
 use Libs\Http\Session;
+use Libs\Http\Request;
 
 class UserController
 {
@@ -14,14 +15,14 @@ class UserController
 
   public function login()
   {
-    if (User::authenticateUser($_POST)) {
-      if (isset($_SESSION['stored_url'])) {
-        $next = Session::get('stored_url');
-        Session::put('stored_url', null);
-        header("Location: ".$next);
-      } else {
+    if (User::authenticateUser(new Request())) {
+      // if (isset($_SESSION['stored_url'])) {
+      //   $next = Session::get('stored_url');
+      //   Session::put('stored_url', null);
+      //   header("Location: ".$next);
+      // } else {
         header("Location: /");
-      }
+      // }
       exit();
     } else {
       echo 'ログインに失敗しました';
@@ -46,5 +47,12 @@ class UserController
     $user->create($_POST);
     header("Location: /");
     exit();
+  }
+
+  public function show()
+  {
+    $isLogin = User::isLogin();
+    $user = Session::get('user');
+    return view('users/show.php', ['isLogin' => $isLogin, 'user' => $user])->setLayout('layout/todo.php');
   }
 }

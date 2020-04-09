@@ -15,6 +15,9 @@ class TestRedirectRequest
     {
         $this->request = new Request();
         $this->validator = Validator::make($this->request->all(), $this->rules());
+        // validationを個別に実行するテスト
+        // ['users'] -> ['users', 'id', '2'] と例外を設定できる。
+        // $this->validator->execute("email", 'unique', ['users', 'id', 2]);
         $this->errors = $this->validator->getErrors();
         $this->changeErrorMessage();
     }

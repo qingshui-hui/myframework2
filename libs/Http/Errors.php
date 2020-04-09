@@ -22,7 +22,10 @@ class Errors
   {
     // $tag = 'email.required' のというような文字列のみを想定
     // エラーの構造は、$this->data = ['email => ['required' => 'error message', 'max' => 'error message']]
-    if (substr_count($tag, '.') != 1) {
+    if (substr_count($tag, '.') !== 1) {
+      return;
+    }
+    if (!ArrayUtil::get_deep($this->data, $tag)) {
       return;
     } else {
       $this->put($tag, $message);

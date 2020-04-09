@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Libs\Database\Model;
+use Libs\Http\Request;
 
 class Todo extends Model
 {
@@ -10,43 +11,46 @@ class Todo extends Model
   protected $primaryKey = ['id'];
   protected $properties = ['id', 'content', 'user_id', 'deadline',  'created_at', 'updated_at'];
 
-  public function daysFromCreation()
+  public static function allWithUsers()
   {
-    $time_from = strtotime($this->created_at);
-    $time_to = strtotime('now');
+    $db = \Libs\Database\Database::getInstance();
+    $query = "select todos.*, users.name as user_name, users.email as user_email from todos 
+        join users on todos.user_id = users.id";
+    $todos = $db->query($query);
+    return static::arrayToObjectList($todos);
+  }
 
-    $dif = $time_to - $time_from;
-    $dif_time = date("H:i:s", $dif);
-    $dif_days = (strtotime(date("Y-m-d", $dif))) / 86400;
-    
-    return "{$dif_days}日 {$dif_time}";
-    // 表示結果の例 "131日 16:02:55"
+  public function convertToRequest()
+  {
+    $this->addPropertiesInForm();
+    $request = new Request();
+    $request->setData([]);
+    $request->put('id', $this->id);
+    $request->put('content', $this->content);
+    $request->put('user_id', $this->user_id);
+    $request->put('date', $this->date);
+    $request->put('hour', $this->hour);
+    $request->put('minute', $this->minute);
+    return $request;
+  }
+
+  public function addPropertiesInForm()
+  {
+    $time = strtotime($this->deadline);
+    $this->date = date('Y/m/d', $time);
+    $this->hour = date('H', $time);
+    $this->minute = date('i', $time);
   }
 
   public function user()
   {
-    return User::find($this->user_id);
+    return User::find($this->user_id) ?? new User();
   }
 
   public function deadline()
   {
     // 11:0 -> 11:00 となるように変換
     return date('Y/m/d H:i', strtotime($this->deadline));
-  }
-
-  public function date()
-  {
-    return date('Y/m/d', strtotime($this->deadline));
-  }
-
-  public function hour()
-  {
-    return date('H', strtotime($this->deadline));
-  }
-
-  public function minute()
-  {
-    return date('i', strtotime($this->deadline));
   }
 
   public function dead() :bool

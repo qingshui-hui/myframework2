@@ -14,7 +14,7 @@ class Validator
     'min' => 'checkMin',
     'nullable' => 'nullable',
   ];
-  private  static $instance = null;
+  private static $instance = null;
   private $input = null;
   private $validatedInput = [];
   private $errors;
@@ -33,25 +33,31 @@ class Validator
     self::init();
     self::$instance->input = $input;
     
-    foreach($validations as $key => $validation) {
+    foreach($validations as $inputKey => $validation) {
       $checkList = preg_split("#\|#", $validation);
       $checkListB = array_map(function($a){return preg_split("#:#", $a);}, $checkList);
       foreach($checkListB as $pair) {
         // $pair[0] is validation tag, $pair[1] is param.
-        $method = new \ReflectionMethod('Libs\Http\Validator', self::validationList[$pair[0]]);
-        $method->setAccessible(true);
         if (isset($pair[1])) {
-          if (!$method->invoke(self::$instance, $key, $pair[1])) {
-            self::$instance->isValid = false;
-          };
+          $args = explode(',', $pair[1]);
         } else {
-          if (!$method->invoke(self::$instance, $key)) {
-            self::$instance->isValid = false;
-          };
+          $args = [];
         }
+        self::$instance->execute($inputKey, $pair[0], $args);
       }
     }
     return self::$instance;
+  }
+
+  public function execute($inputKey, $validationName, array $args)
+  {
+    $method = new \ReflectionMethod('Libs\Http\Validator', self::validationList[$validationName]);
+    $method->setAccessible(true);
+    $args = array_merge([$inputKey], $args);
+    if (!$method->invokeArgs($this, $args)) {
+      $this->isValid = false;
+    };
+    return $this;
   }
 
   public function fails()
@@ -80,22 +86,22 @@ class Validator
 
   // ---- private methods -------
 
-  private function exist($value) :bool
+  private function emptyInput($value) :bool
   {
     if (!isset($value)) {
-      return false;
+      return true;
     } else if (is_string($value)) {
       $value = trim($value);
       if ($value === "") {
-        return false;
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
   private function checkExistence($key) :bool
   {
-    if (!$this->exist($this->input[$key])) {
+    if ($this->emptyInput($this->input[$key])) {
       $this->errors->put("{$key}.required", "{$key}が入力されていません");
       return false;
     } else {
@@ -104,17 +110,19 @@ class Validator
     }
   }
 
-  private function checkUniqueness($key, $dataTable) :bool
+  private function checkUniqueness($key, $dataTable, $exceptionalKey=null, $exceptionalVal=null) :bool
   {
     $db = Database::getInstance();
-    if (isset($this->input['id'])) {
+    $query = "SELECT * FROM {$dataTable} WHERE {$key} = :{$key}";
+    $params = [$key => $this->input[$key]];
+    if (isset($exceptionalKey) && isset($exceptionalVal)) {
+      $query .= " AND NOT {$exceptionalKey} = :{$exceptionalKey}";
+      $params[$exceptionalKey] = $exceptionalVal;
+    } else if (isset($this->input['id'])) {
       // id が渡されたときは、そのidのレコードについては唯一性のチェックから外すように修正
       $id = intval($this->input['id']);
-      $query = "SELECT * FROM {$dataTable} WHERE {$key} = :{$key} AND NOT id = :id;";
-      $params = [$key => $this->input[$key], 'id' => $id];
-    } else {
-      $query = "SELECT * FROM {$dataTable} WHERE {$key} = :{$key};";
-      $params = [$key => $this->input[$key]];
+      $query .= " AND id <> :id";
+      $params['id'] = $id;
     }
     $data = $db->query($query, $params);
 
@@ -129,7 +137,7 @@ class Validator
 
   private function checkMax($key, $intMax) :bool
   {
-    if (!$this->exist($this->input[$key])) {
+    if ($this->emptyInput($this->input[$key])) {
       return true;
     }
     if (mb_strlen($this->input[$key]) > $intMax) {
@@ -143,7 +151,7 @@ class Validator
 
   private function checkMin($key, $intMin) :bool
   {
-    if (!$this->exist($this->input[$key])) {
+    if ($this->emptyInput($this->input[$key])) {
       return true;
     }
     if (mb_strlen($this->input[$key]) < $intMin) {

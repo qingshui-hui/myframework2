@@ -46,6 +46,7 @@ $users = [
 <p><a href="/test-validation">/test-validation</a></p>
 <p><a href="/test-redirect">/test-redirect</a></p>
 <p><a href="/test-route">/routeList</a></p>
+<p><a href="/test5">/test5</a></p>
 
 <form action="/test4" method="POST" enctype="multipart/form-data">
   <div>名前

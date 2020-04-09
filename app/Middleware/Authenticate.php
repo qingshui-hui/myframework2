@@ -15,12 +15,12 @@ class Authenticate
 
   private function RedirectIfNotLogin() :bool
   {
-    if (!User::isLogin()) {
+    if (User::isLogin()) {
+      return true;
+    } else {
       Session::put("stored_url", $_SERVER['REQUEST_URI']);
       header('Location: /login');
       return false;
-    } else {
-      return true;
     }
   }
 }

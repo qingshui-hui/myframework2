@@ -22,6 +22,6 @@
   </li>
 </ul>
 <div class="links">
-  <a href="/todos/<?=$todo->id?>/edit?id=<?=$todo->id?>">編集</a>
-  <a href="/todos/<?=$todo->id?>/destroy?id=<?=$todo->id?>">削除</a>
+  <a href="/todos/<?=$todo->id?>/edit">編集</a>
+  <a href="/todos/<?=$todo->id?>/destroy">削除</a>
 </div>

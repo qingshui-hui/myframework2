@@ -42,7 +42,11 @@ class Model {
 
   public function update($params, $id)
   {
-    $params['updated_at'] = date('Y-m-d H:i:s');
+    // id を$paramsと別にすることで、createと$paramsの中身を同じにしても、動くようになる。
+    if (in_array('updated_at', $this->properties)) {
+      $params['updated_at'] = date('Y-m-d H:i:s');
+    }
+    $params['id'] = $id;
     $permittedParams = $this->permitProperties($params);
     $query = Query::updateOneRecord($permittedParams, static::$table);
     $this->db->execute($query, $permittedParams);
@@ -58,6 +62,25 @@ class Model {
     $this->db->execute($query, ['id' => $id]);
   }
 
+  public static function arrayToObject(Array $record)
+  {
+    $obj = new static();
+    unset($obj->db);
+    foreach($record as $key => $val) {
+      $obj->$key = $val;
+    }
+    return $obj;
+  }
+
+  public static function arrayToObjectList(Array $records)
+  {
+    $objectList = [];
+    foreach ($records as $r) {
+      array_push($objectList, static::arrayToObject($r));
+    }
+    return $objectList;
+  }
+
   // --- protected members ---
 
   protected function permitProperties($params)
@@ -71,28 +94,14 @@ class Model {
     return $results;
   }
 
-  protected static function arrayToObject(Array $record)
-  {
-    $obj = new static();
-    foreach($record as $key => $val) {
-      $obj->$key = $val;
-    }
-    return $obj;
-  }
-
-  protected static function arrayToObjectList(Array $records)
-  {
-    $objectList = [];
-    foreach ($records as $r) {
-      array_push($objectList, static::arrayToObject($r));
-    }
-    return $objectList;
-  }
-
   protected function _joinDatetimesInsert($params)
   {
-    $params['created_at'] = date('Y-m-d H:i:s');
-    $params['updated_at'] = date('Y-m-d H:i:s');
+    if (in_array('created_at', $this->properties)) {
+      $params['created_at'] = date('Y-m-d H:i:s');
+    }
+    if (in_array('updated_at', $this->properties)) {
+      $params['updated_at'] = date('Y-m-d H:i:s');
+    }
 		return $params;
   }
 }
